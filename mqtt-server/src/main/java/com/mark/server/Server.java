@@ -1,9 +1,8 @@
 package com.mark.server;
 import io.netty.bootstrap.ServerBootstrap;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelOption;
-import io.netty.channel.EventLoopGroup;
+import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.socket.SocketChannel;
 import lombok.Data;
 import org.apache.commons.lang3.concurrent.BasicThreadFactory;
 
@@ -138,6 +137,12 @@ public class Server {
          * 适用于带宽有限、即时性要求高的场景
          */
         bootstrap.childOption(ChannelOption.TCP_NODELAY, tcpNoDelay);
+        bootstrap.childHandler(new ChannelInitializer<SocketChannel>() {
+            @Override
+            protected void initChannel(SocketChannel ch) throws Exception {
+                ChannelPipeline pipeline = ch.pipeline();
+            }
+        });
         return null;
     }
 }
