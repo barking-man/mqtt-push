@@ -3,6 +3,7 @@ package com.mark.handler;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.mark.constants.MessageConstant;
+import com.mark.exception.ServiceException;
 import com.mark.message.Request;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
@@ -32,6 +33,8 @@ public class JsonDecoder extends MessageToMessageDecoder<ByteBuf> {
             request.setMessage(json.getString(MessageConstant.MESSAGE));
             // 将解码后的请求对象加入输出列表，传递给下一处理器
             out.add(request);
+        } else {
+            throw new ServiceException("解码失败，非法消息类型：" + type);
         }
 
     }

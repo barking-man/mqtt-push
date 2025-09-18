@@ -1,8 +1,12 @@
 package com.mark.server;
+import com.mark.handler.JsonDecoder;
+import com.mark.handler.JsonEncoder;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
+import io.netty.handler.codec.mqtt.MqttDecoder;
+import io.netty.handler.codec.mqtt.MqttEncoder;
 import lombok.Data;
 import org.apache.commons.lang3.concurrent.BasicThreadFactory;
 
@@ -141,6 +145,10 @@ public class Server {
             @Override
             protected void initChannel(SocketChannel ch) throws Exception {
                 ChannelPipeline pipeline = ch.pipeline();
+                pipeline.addLast(new JsonDecoder());
+                pipeline.addLast(new JsonEncoder());
+                pipeline.addLast(new MqttDecoder());
+                pipeline.addLast(MqttEncoder.INSTANCE);
             }
         });
         return null;
