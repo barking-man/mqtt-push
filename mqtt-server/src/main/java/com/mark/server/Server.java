@@ -145,8 +145,6 @@ public class Server {
             @Override
             protected void initChannel(SocketChannel ch) throws Exception {
                 ChannelPipeline pipeline = ch.pipeline();
-                pipeline.addLast(new JsonDecoder());
-                pipeline.addLast(new JsonEncoder());
                 pipeline.addLast(new MqttDecoder());
                 pipeline.addLast(MqttEncoder.INSTANCE);
             }
