@@ -1,13 +1,16 @@
 package com.mark.server;
 import com.mark.handler.JsonDecoder;
 import com.mark.handler.JsonEncoder;
+import com.mark.handler.MqttServerHandler;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.codec.mqtt.MqttDecoder;
 import io.netty.handler.codec.mqtt.MqttEncoder;
+import io.netty.handler.timeout.IdleStateHandler;
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.concurrent.BasicThreadFactory;
 
 import java.util.concurrent.*;
@@ -19,6 +22,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @description
  */
 @Data
+@Slf4j
 public class Server {
 
     /**
@@ -147,8 +151,18 @@ public class Server {
                 ChannelPipeline pipeline = ch.pipeline();
                 pipeline.addLast(new MqttDecoder());
                 pipeline.addLast(MqttEncoder.INSTANCE);
+                pipeline.addLast(new IdleStateHandler(30, 0, 0));
+                pipeline.addLast(new MqttServerHandler());
             }
         });
-        return null;
+        ChannelFuture future = bootstrap.bind(host, port);
+        future.addListener((ChannelFutureListener) listener -> {
+            if (listener.isSuccess()) {
+                log.info("MQTT服务启动成功，地址：{}", host + ":" + port);
+            } else {
+                log.error("MQTT服务启动失败，原因：", listener.cause());
+            }
+        });
+        return future;
     }
 }

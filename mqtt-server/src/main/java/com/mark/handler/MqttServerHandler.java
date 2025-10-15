@@ -1,5 +1,6 @@
 package com.mark.handler;
 
+import com.mark.exception.ServiceException;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.codec.mqtt.*;
@@ -18,6 +19,13 @@ import java.util.Objects;
 public class MqttServerHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+        if (msg instanceof MqttMessage) {
+            MqttMessage mqttMessage = (MqttMessage) msg;
+            handleMqttMessage(ctx, mqttMessage);
+        } else {
+            throw new ServiceException("非法的消息类型");
+        }
+
         super.channelRead(ctx, msg);
     }
 
@@ -26,6 +34,14 @@ public class MqttServerHandler extends ChannelInboundHandlerAdapter {
         switch (mqttFixedHeader.messageType()) {
             case CONNECT:
                 handleConnectMsg(ctx, (MqttConnectMessage) msg);
+            case PINGREQ:
+                handlePingMsg(ctx);
+            case PUBLISH:
+                handlePublishMsg(ctx, (MqttPublishMessage) msg);
+            case SUBSCRIBE:
+                handleSubscribeMsg(ctx, (MqttSubscribeMessage) msg);
+            default:
+                log.warn("无法处理的消息类型:{}", mqttFixedHeader.messageType());
         }
     }
 
