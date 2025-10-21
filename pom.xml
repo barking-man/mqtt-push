@@ -11,6 +11,7 @@
     <modules>
         <module>mqtt-server</module>
         <module>mqtt-client</module>
+        <module>mqtt-common</module>
     </modules>
 
     <properties>

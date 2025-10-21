@@ -1,6 +1,7 @@
 package com.mark.client;
 
 import com.mark.handler.MqttClientHandler;
+import com.mark.utils.MqttUtil;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -67,6 +68,16 @@ public class MqttClient {
 
             // 发起连接并同步等待结果
             ChannelFuture future = bootstrap.connect(serverHost, serverPort).sync();
+            future.addListener(new ChannelFutureListener() {
+                @Override
+                public void operationComplete(ChannelFuture channelFuture) throws Exception {
+                    if (future.isSuccess()) {
+                        log.info("Connected to {}:{} success", serverHost, serverPort);
+                    } else {
+                        log.info("Connected to {}:{} fail", serverHost, serverPort);
+                    }
+                }
+            });
             if (future.isSuccess()) {
                 channel = future.channel();
                 log.info("MQTT客户端连接成功！clientId={}, 服务端={}:{}", clientId, serverHost, serverPort);
@@ -101,7 +112,7 @@ public class MqttClient {
                 MqttVersion.MQTT_3_1_1.protocolName(), // 协议名（MQTT）
                 MqttVersion.MQTT_3_1_1.protocolLevel(), // 协议版本（3.1.1对应4）
                 false, // 是否清除会话（false=保留会话，true=断开后清除）
-                false, // 是否有遗嘱消息
+                true, // 是否有遗嘱消息
                 false, // 是否遗嘱消息保留
                 MqttQoS.AT_MOST_ONCE.value(), // 遗嘱消息QoS
                 false, // 是否需要用户名
@@ -125,7 +136,6 @@ public class MqttClient {
                         false, // 是否重发（首次发送为false）
                         MqttQoS.AT_MOST_ONCE, // QoS等级（CONNECT固定为0）
                         false, // 是否保留（CONNECT固定为false）
-                        //TODO 手动计算长度
                         0
                 ),
                 varHeader,
@@ -154,6 +164,7 @@ public class MqttClient {
         // 1. 构建订阅条目（主题+QoS）
         MqttTopicSubscription subscription = new MqttTopicSubscription(topic, qoS);
         List<MqttTopicSubscription> subscriptionList = new ArrayList<>();
+        subscriptionList.add(subscription);
         MqttSubscribePayload payload = new MqttSubscribePayload(subscriptionList);
 
         // 2. 构建完整SUBSCRIBE消息
