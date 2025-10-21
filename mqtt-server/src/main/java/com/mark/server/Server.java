@@ -130,7 +130,7 @@ public class Server {
     /**
      * 服务端参数方法
      */
-    public ChannelFuture bind() {
+    public void bind() throws InterruptedException {
         this.init();
 
         bootstrap = new ServerBootstrap();
@@ -163,6 +163,7 @@ public class Server {
                 log.error("MQTT服务启动失败，原因：", listener.cause());
             }
         });
-        return future;
+        // 阻塞主线程，知道服务端通道关闭
+        future.channel().closeFuture().sync();
     }
 }
