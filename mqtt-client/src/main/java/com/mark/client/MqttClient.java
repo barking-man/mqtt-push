@@ -112,7 +112,7 @@ public class MqttClient {
                 MqttVersion.MQTT_3_1_1.protocolName(), // 协议名（MQTT）
                 MqttVersion.MQTT_3_1_1.protocolLevel(), // 协议版本（3.1.1对应4）
                 false, // 是否清除会话（false=保留会话，true=断开后清除）
-                true, // 是否有遗嘱消息
+                false, // 是否有遗嘱消息
                 false, // 是否遗嘱消息保留
                 MqttQoS.AT_MOST_ONCE.value(), // 遗嘱消息QoS
                 false, // 是否需要用户名
@@ -123,10 +123,10 @@ public class MqttClient {
         // 2. 构建CONNECT消息的有效载荷（客户端ID、用户名、密码，此处简化无密码）
         MqttConnectPayload payload = new MqttConnectPayload(
                 clientId, // 客户端唯一ID（必须）
-                "will", // 遗嘱主题（无遗嘱则为null）
-                "willContent", // 遗嘱消息内容（无遗嘱则为null）
+                null, // 遗嘱主题（无遗嘱则为null）
+                new byte[0], // 遗嘱消息内容（无遗嘱则为null）
                 null, // 用户名（无则为null）
-                null  // 密码（无则为null）
+                new byte[0]  // 密码（无则为null）
         );
 
         // 3. 构建完整CONNECT消息

@@ -100,25 +100,26 @@ public class MqttClientHandler extends ChannelInboundHandlerAdapter {
     /**
      * 处理心跳超时：5秒没发消息，发送PINGREQ给服务端
      */
-//    @Override
-//    public void userEventTriggered(ChannelHandlerContext ctx, Object evt) {
-//        if (evt instanceof IdleStateEvent event) {
-//            if (event.state() == IdleState.WRITER_IDLE) {
-//                // 发送心跳请求（PINGREQ）
-//                MqttMessage pingReq = new MqttMessage(
-//                        new MqttFixedHeader(
-//                                MqttMessageType.PINGREQ,
-//                                false,
-//                                MqttQoS.AT_MOST_ONCE,
-//                                false,
-//                                0
-//                        )
-//                );
-//                ctx.writeAndFlush(pingReq);
-//                log.info("发送心跳请求（PINGREQ）");
-//            }
-//        }
-//    }
+    @Override
+    public void userEventTriggered(ChannelHandlerContext ctx, Object evt) {
+        if (evt instanceof IdleStateEvent) {
+            IdleStateEvent event = (IdleStateEvent) evt;
+            if (event.state() == IdleState.WRITER_IDLE) {
+                // 发送心跳请求（PINGREQ）
+                MqttMessage pingReq = new MqttMessage(
+                        new MqttFixedHeader(
+                                MqttMessageType.PINGREQ,
+                                false,
+                                MqttQoS.AT_MOST_ONCE,
+                                false,
+                                0
+                        )
+                );
+                ctx.writeAndFlush(pingReq);
+                log.info("发送心跳请求（PINGREQ）");
+            }
+        }
+    }
 
     /**
      * 处理异常（如断连）

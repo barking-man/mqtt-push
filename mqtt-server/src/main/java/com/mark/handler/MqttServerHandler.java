@@ -34,12 +34,16 @@ public class MqttServerHandler extends ChannelInboundHandlerAdapter {
         switch (mqttFixedHeader.messageType()) {
             case CONNECT:
                 handleConnectMsg(ctx, (MqttConnectMessage) msg);
+                break;
             case PINGREQ:
                 handlePingMsg(ctx);
+                break;
             case PUBLISH:
                 handlePublishMsg(ctx, (MqttPublishMessage) msg);
+                break;
             case SUBSCRIBE:
                 handleSubscribeMsg(ctx, (MqttSubscribeMessage) msg);
+                break;
             default:
                 log.warn("无法处理的消息类型:{}", mqttFixedHeader.messageType());
         }
