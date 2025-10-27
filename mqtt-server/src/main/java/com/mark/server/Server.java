@@ -1,6 +1,4 @@
 package com.mark.server;
-import com.mark.handler.JsonDecoder;
-import com.mark.handler.JsonEncoder;
 import com.mark.handler.MqttServerHandler;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.*;
@@ -130,8 +128,10 @@ public class Server {
 
     /**
      * 服务端参数方法
+     *
+     * @return
      */
-    public void bind() throws InterruptedException {
+    public ChannelFuture bind() throws InterruptedException {
         this.init();
 
         bootstrap = new ServerBootstrap();
@@ -165,7 +165,6 @@ public class Server {
                 log.error("MQTT服务启动失败，原因：", listener.cause());
             }
         });
-        // 阻塞主线程，知道服务端通道关闭
-        future.channel().closeFuture().sync();
+        return future;
     }
 }
